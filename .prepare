@@ -1,0 +1,15 @@
+CHAINCODE_VERSION="$(date +%s)"
+CHAINCODE_POLICY="AND('org0.member', OutOf(1, 'org1.member', 'org2.member'))"
+
+key1="$(_crypto_msp_by_org "org0" "User1")/keystore/priv_sk"
+ski1="$(_tool_ski "$key1")"
+
+key2="$(_crypto_msp_by_org "org0" "User2")/keystore/priv_sk"
+ski2="$(_tool_ski "$key2")"
+
+key="$DATA/out/key.pem"
+[ -r "$key" ] || openssl genpkey -algorithm ed25519 -outform PEM -out "$key"
+address="$(_tool_address "$key")"
+
+# by default robot uses User1 than not suitable for chaincode admin 
+CHAINCODE_INIT="{\"Args\":[\"${ski2}\", \"${ski1}\", \"${address}\"]}"
